@@ -34,6 +34,7 @@
         <th>Trạng thái</th>
         <th>Diện tích</th>
         <th>Tầng</th>
+        <th>Mô tả chi tiết</th>
         <th>Giá</th>
         <th>Ngày bắt đầu</th>
         <th>Ngày kết thúc</th>

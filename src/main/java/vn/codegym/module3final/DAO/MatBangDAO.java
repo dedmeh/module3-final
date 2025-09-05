@@ -8,13 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MatBangDAO {
-    private String jdbcUrl = "jdbc:mysql://localhost:3306/TComplex?useSSL=false&serverTimezone=UTC";;
+    private String jdbcUrl = "jdbc:mysql://localhost:3306/TComplex?useSSL=false&serverTimezone=UTC";
     private String jdbcUsername = "root";
     private String jdbcPassword = "123456";
 
-    private static final String ADD_MAT_BANG = "INSERT INTO MatBang (MaMatBang, LoaiMatBang, TrangThai, DienTich, Tang, Gia, NgayBatDau, NgayKetThuc, GhiChu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String ADD_MAT_BANG = "INSERT INTO MatBang (MaMatBang, MaLoai, TrangThai, DienTich, Tang, Gia, NgayBatDau, NgayKetThuc, GhiChu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private static final String SELECT_MAT_BANG_BY_ID = "SELECT * FROM MatBang WHERE MaMatBang = ?";
     private static final String SELECT_ALL_SQL = "SELECT * FROM matbang ORDER BY dientich ASC";
+    private static final String DELETE_MAT_BANG = "DELETE FROM matbang WHERE MaMatBang = ?";
 
     public MatBangDAO() {}
 
@@ -30,7 +31,7 @@ public class MatBangDAO {
     }
 
     public boolean addMatBang(MatBangChoThue maMatBang) {
-        MatBangChoThue matBang = null;
+        System.out.println(maMatBang);
         try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(ADD_MAT_BANG)) {
             stmt.setString(1, maMatBang.getMaMatBang());
             stmt.setString(2, maMatBang.getLoaiVanPhong());
@@ -38,7 +39,7 @@ public class MatBangDAO {
             stmt.setDouble(4, maMatBang.getDienTich());
             stmt.setInt(5, maMatBang.getTang());
             stmt.setLong(6, maMatBang.getGiaChoThue());
-            stmt.setDate(7, Date.valueOf(matBang.getNgayBatDau()));
+            stmt.setDate(7, Date.valueOf(maMatBang.getNgayBatDau()));
             stmt.setDate(8, Date.valueOf(maMatBang.getNgayKetThuc()));
             stmt.setString(9, maMatBang.getMoTaChiTiet());
             return stmt.executeUpdate() > 0;
@@ -59,7 +60,7 @@ public class MatBangDAO {
                         rs.getDouble("DienTich"),
                         rs.getString("TrangThai"),
                         rs.getInt("Tang"),
-                        rs.getString("LoaiMatBang"),
+                        rs.getString("MaLoai"),
                         rs.getString("GhiChu"),
                         rs.getLong("Gia"),
                         rs.getDate("NgayBatDau").toLocalDate(),
@@ -82,7 +83,7 @@ public class MatBangDAO {
                 double dientich = rs.getDouble("DienTich");
                 String trangthai = rs.getString("TrangThai");
                 int tang = rs.getInt("Tang");
-                String loai = rs.getString("LoaiMatBang");
+                String loai = rs.getString("MaLoai");
                 String ghichu = rs.getString("GhiChu");
                 long gia = rs.getLong("Gia");
                 LocalDate ngaybd =rs.getDate("NgayBatDau").toLocalDate();
@@ -91,5 +92,16 @@ public class MatBangDAO {
             }
         }
         return list;
+    }
+
+    public boolean deleteMatBang(String maMatBang) {
+        boolean rowDeleted = false;
+        try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(DELETE_MAT_BANG)) {
+            stmt.setString(1, maMatBang);
+            rowDeleted = stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return rowDeleted;
     }
 }

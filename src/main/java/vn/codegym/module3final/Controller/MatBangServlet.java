@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -27,6 +28,9 @@ public class MatBangServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
         String action = req.getParameter("action");
         if (action == null) {
             action = "";
@@ -37,13 +41,41 @@ public class MatBangServlet extends HttpServlet {
                 case "add":
                     showAddForm(req, resp);
                     break;
-
+                case "delete":
+                    deleteMatBang(req, resp);
+                    break;
                 default:
                     listMatBang(req, resp);
+                    break;
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
+        String action = req.getParameter("action");
+        if (action == null) {
+            action = "";
+        }
+        try {
+            switch (action) {
+                case "add":
+                    insertMatBang(req, resp);
+                    break;
+                default:
+                    listMatBang(req, resp);
+                    break;
+            }
+        }  catch (Exception e) {
+            e.printStackTrace();
+            req.getSession().setAttribute("errorMessage", "Lỗi database: " + e.getMessage());
+        }
+
     }
 
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)
@@ -65,8 +97,8 @@ public class MatBangServlet extends HttpServlet {
         int tang = Integer.parseInt(request.getParameter("tang"));
         long gia = Long.parseLong(request.getParameter("gia"));
         String chitiet = request.getParameter("chitiet");
-        LocalDate ngayBD = LocalDate.parse(request.getParameter("ngaybd"), formatter);
-        LocalDate ngayKT = LocalDate.parse(request.getParameter("ngaykt"), formatter);
+        LocalDate ngayBD = LocalDate.parse(request.getParameter("ngaybd"));
+        LocalDate ngayKT = LocalDate.parse(request.getParameter("ngaykt"));
 
         MatBangChoThue mb = new MatBangChoThue(ma, dienTich, trangThai, tang, loai, chitiet, gia, ngayBD, ngayKT);
 
@@ -74,6 +106,7 @@ public class MatBangServlet extends HttpServlet {
         String error = Validator.validate(mb);
         if (error != null) {
             request.setAttribute("errorMessage", error);
+            request.setAttribute("matBang", mb); // giữ lại dữ liệu nhập
             request.getRequestDispatcher("add.jsp").forward(request, response);
             return;
         }
@@ -88,9 +121,10 @@ public class MatBangServlet extends HttpServlet {
         // Insert DB
         boolean success = dao.addMatBang(mb);
         if (success) {
-            request.setAttribute("successMessage", "Thêm mới thành công!");
+            response.sendRedirect("TComplex?action=list");
         } else {
             request.setAttribute("errorMessage", "Thêm mới thất bại!");
+            request.getRequestDispatcher("add.jsp").forward(request, response);
         }
 
         request.getRequestDispatcher("add.jsp").forward(request, response);
@@ -102,6 +136,13 @@ public class MatBangServlet extends HttpServlet {
         request.setAttribute("list", list);
         RequestDispatcher dispatcher = request.getRequestDispatcher("list.jsp");
         dispatcher.forward(request, response);
+    }
+
+    private void deleteMatBang(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+        String maMatBang = request.getParameter("ma");
+        dao.deleteMatBang(maMatBang);
+        response.sendRedirect("/TComplex?action=list");
     }
 
 }

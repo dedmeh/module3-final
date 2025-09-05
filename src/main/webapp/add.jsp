@@ -5,64 +5,82 @@
   Time: 8:45 PM
   To change this template use File | Settings | File Templates.
 --%>
+<meta charset="UTF-8">
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<% String error = (String) request.getAttribute("errorMessage"); %>
+<% if (error != null) { %>
+<div style="color:red"><%= error %></div>
+<% } %>
 <html>
 <head>
     <title>Title</title>
 </head>
 <body>
-<p>hi</p>
-<form action="add" method="post">
+<a href="TComplex?action=list">Quay lại danh sách</a>
+
+    <h2>Thêm mặt bằng mới</h2>
+
+    <form action="TComplex" method="post">
     <input type="hidden" name="action" value="add"/>
 
-    Mã mặt bằng (*) <input type="text" name="ma" required> <br>
-
-    Diện tích (*) <input type="text" name="dientich" required> <br>
-
-    Trạng thái (*) <select name="trangthai">
-    <option value="Trống">Trống</option>
-    <option value="Hạ Tầng">Hạ Tầng</option>
-    <option value="Đầy Đủ">Đầy Đủ</option>
-    <br>
-
-    Tầng (*) <select name="tang" >
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-    <option value="5">5</option>
-    <option value="6">6</option>
-    <option value="7">7</option>
-    <option value="8">8</option>
-    <option value="9">9</option>
-    <option value="10">10</option>
-    <option value="11">11</option>
-    <option value="12">12</option>
-    <option value="13">13</option>
-    <option value="14">14</option>
-    <option value="15">15</option>
-</select> <br>
-
-    Loại văn phòng (*) <select name="loai" >
-    <option value="chiase">Văn phòng chia sẻ</option>
-    <option value="trongoi">Văn phòng trọn gói</option>
-</select>
-    Giá
-            <td>Giá cho thuê:</td>
-            <td><input type="number" step="0.01" name="giaChoThue" required/></td>
+    <table>
+        <tr>
+            <td>Mã mặt bằng (*):</td>
+            <td><input type="text" name="ma" required/></td>
         </tr>
         <tr>
-            <td>Ngày bắt đầu:</td>
-            <td><input type="date" name="ngayBatDau" required/></td>
+            <td>Diện tích (*):</td>
+            <td><input type="number" name="dientich" min="20" required/></td>
         </tr>
         <tr>
-            <td>Ngày kết thúc:</td>
-            <td><input type="date" name="ngayKetThuc" required/></td>
+            <td>Trạng thái (*):</td>
+            <td>
+                <select name="trangthai" required>
+                    <option value="Trống">Trống</option>
+                    <option value="Hạ tầng">Hạ tầng</option>
+                    <option value="Đầy đủ">Đầy đủ</option>
+                </select>
+            </td>
         </tr>
-
+        <tr>
+            <td>Tầng (*):</td>
+            <td>
+                <select name="tang" required>
+                    <% for (int i = 1; i <= 15; i++) { %>
+                    <option value="<%= i %>"><%= i %></option>
+                    <% } %>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Loại văn phòng (*):</td>
+            <td>
+                <select name="loai" required>
+                    <option value="Văn phòng chia sẻ">Văn phòng chia sẻ</option>
+                    <option value="Văn phòng trọn gói">Văn phòng trọn gói</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>Mô tả chi tiết:</td>
+            <td><textarea name="chitiet" rows="3" cols="40"></textarea></td>
+        </tr>
+        <tr>
+            <td>Giá cho thuê (*):</td>
+            <td><input type="number" name="gia" min="1000000" required/> VNĐ</td>
+        </tr>
+        <tr>
+            <td>Ngày bắt đầu (*):</td>
+            <td><input type="date" name="ngaybd" required/></td>
+        </tr>
+        <tr>
+            <td>Ngày kết thúc (*):</td>
+            <td><input type="date" name="ngaykt" required/></td>
+        </tr>
+    </table>
 
     <input type="submit" value="Lưu"/>
-    <a href="matbang?action=list">Quay lại danh sách</a>
+    <a href="/TComplex?action=list"><button type="button">Hủy</button></a>
 </form>
 </body>
 </html>
